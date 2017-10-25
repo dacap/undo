@@ -1,5 +1,5 @@
 // Undo Library
-// Copyright (C) 2015-2016 David Capello
+// Copyright (C) 2015-2017 David Capello
 //
 // This file is released under the terms of the MIT license.
 // Read LICENSE.txt for more information.
@@ -12,10 +12,13 @@
 #include <cassert>
 #include <stack>
 
+#define UNDO_TRACE(...)
+
 namespace undo {
 
-UndoHistory::UndoHistory()
-  : m_first(nullptr)
+UndoHistory::UndoHistory(UndoHistoryDelegate* delegate)
+  : m_delegate(delegate)
+  , m_first(nullptr)
   , m_last(nullptr)
   , m_cur(nullptr)
 {
@@ -64,7 +67,7 @@ void UndoHistory::clearRedo()
        state && state != m_cur;
        state = prev) {
     prev = state->m_prev;
-    delete state;
+    deleteState(state);
   }
 
   if (m_cur) {
@@ -74,6 +77,58 @@ void UndoHistory::clearRedo()
   else {
     m_first = m_last = nullptr;
   }
+}
+
+bool UndoHistory::deleteFirstState()
+{
+  UNDO_TRACE("UndoHistory::deleteFirstState()\n");
+
+  // We cannot delete the first state if we are in the first state.
+  if (m_cur == m_first) {
+    UNDO_TRACE(" - Cannot delete first state if it's the current state\n");
+    return false;
+  }
+
+  UndoState* i = m_last;
+  while (i) {
+    // If this state depends on the delete one, this "i" is the new
+    // m_first undo state.
+    if (i->m_parent == m_first) {
+      // First we check if the current undo state is one of the states
+      // that we're going to delete.
+      UndoState* j = m_first;
+      while (j != i) {
+        // Cannot delete this "j" state because is the current one.
+        if (m_cur == j) {
+          UNDO_TRACE(" - Cannot delete first state because current state depends on it to go to the last state\n");
+          return false;
+        }
+        j = j->next();
+      }
+
+      j = m_first;
+      while (j != i) {
+        UNDO_TRACE(" - Delete undo state\n");
+        deleteState(j);
+        j = j->next();
+      }
+
+      i->m_prev = nullptr;
+      i->m_parent = nullptr;
+      m_first = i;
+      return true;
+    }
+    i = i->prev();
+  }
+
+  UndoState* state = m_first;
+  assert(m_last == m_first);
+  assert(m_first->next() == nullptr);
+  m_first = m_last = nullptr;
+  UNDO_TRACE(" - Delete first state only\n");
+
+  deleteState(state);
+  return true;
 }
 
 void UndoHistory::add(UndoCommand* cmd)
@@ -144,6 +199,14 @@ void UndoHistory::moveTo(const UndoState* new_state)
   }
 
   m_cur = const_cast<UndoState*>(new_state);
+}
+
+void UndoHistory::deleteState(UndoState* state)
+{
+  if (m_delegate)
+    m_delegate->onDeleteUndoState(state);
+
+  delete state;
 }
 
 } // namespace undo

@@ -1,5 +1,5 @@
 // Undo Library
-// Copyright (C) 2015-2016 David Capello
+// Copyright (C) 2015-2017 David Capello
 //
 // This file is released under the terms of the MIT license.
 // Read LICENSE.txt for more information.
@@ -14,8 +14,8 @@ using namespace undo;
 int main(int argc, char** argv)
 {
   // 1 --- 2
-  //  |
-  //   ------ 3 --- 4
+  // |
+  //  ------- 3 --- 4
   int model = 0;
   Cmd cmd1(model, 1, 0);
   Cmd cmd2(model, 2, 1);
