@@ -1,5 +1,5 @@
 // Undo Library
-// Copyright (C) 2015-2016 David Capello
+// Copyright (C) 2015-2017 David Capello
 //
 // This file is released under the terms of the MIT license.
 // Read LICENSE.txt for more information.
@@ -26,10 +26,19 @@ namespace undo {
       , m_parent(nullptr)
       , m_cmd(cmd) {
     }
+
     ~UndoState() {
       if (m_cmd)
         m_cmd->dispose();
+
+#ifdef _DEBUG
+      m_prev = nullptr;
+      m_next = nullptr;
+      m_parent = nullptr;
+      m_cmd = nullptr;
+#endif
     }
+
     UndoState* prev() const { return m_prev; }
     UndoState* next() const { return m_next; }
     UndoCommand* cmd() const { return m_cmd; }

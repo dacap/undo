@@ -63,7 +63,7 @@ void UndoHistory::redo()
 
 void UndoHistory::clearRedo()
 {
-  for (UndoState* state = m_last, *prev;
+  for (UndoState* state = m_last, *prev = nullptr;
        state && state != m_cur;
        state = prev) {
     prev = state->m_prev;
@@ -109,8 +109,11 @@ bool UndoHistory::deleteFirstState()
       j = m_first;
       while (j != i) {
         UNDO_TRACE(" - Delete undo state\n");
-        deleteState(j);
+
+        UndoState* k = j;
         j = j->next();
+
+        deleteState(k);
       }
 
       i->m_prev = nullptr;
