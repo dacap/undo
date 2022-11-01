@@ -1,5 +1,5 @@
 // Undo Library
-// Copyright (C) 2015-2017 David Capello
+// Copyright (C) 2015-2022 David Capello
 //
 // This file is released under the terms of the MIT license.
 // Read LICENSE.txt for more information.
@@ -63,19 +63,24 @@ void UndoHistory::redo()
 
 void UndoHistory::clearRedo()
 {
-  for (UndoState* state = m_last, *prev = nullptr;
-       state && state != m_cur;
-       state = prev) {
-    prev = state->m_prev;
-    deleteState(state);
-  }
+  UndoState* state = m_last;
 
+  // First we break the chain of undo states because deleteState() can
+  // generate an onDeleteUndoState() notification which might try to
+  // iterate over the whole UndoHistory.
   if (m_cur) {
     m_cur->m_next = nullptr;
     m_last = m_cur;
   }
   else {
     m_first = m_last = nullptr;
+  }
+
+  for (UndoState* prev = nullptr;
+       state && state != m_cur;
+       state = prev) {
+    prev = state->m_prev;
+    deleteState(state);
   }
 }
 

@@ -1,5 +1,5 @@
 # Undo Library
-# Copyright (C) 2015-2021 David Capello
+# Copyright (C) 2015-2022 David Capello
 
 cmake_minimum_required(VERSION 3.2)
 
