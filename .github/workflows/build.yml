@@ -8,7 +8,7 @@ jobs:
       matrix:
         os: [windows-latest, macos-latest, ubuntu-latest]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - uses: ilammy/msvc-dev-cmd@v1
       if: runner.os == 'Windows'
     - name: Generating Makefiles
@@ -20,14 +20,7 @@ jobs:
           cmake . -G "Unix Makefiles"
         fi
     - name: Compiling
-      shell: bash
-      run: |
-        if [[ "${{ runner.os }}" == "Windows" ]] ; then
-          nmake
-        else
-          make
-        fi
+      run: cmake --build .
     - name: Running Tests
       shell: bash
-      run: |
-        ctest --output-on-failure
+      run: ctest --output-on-failure
