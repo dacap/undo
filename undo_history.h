@@ -1,5 +1,5 @@
 // Undo Library
-// Copyright (C) 2015-2017 David Capello
+// Copyright (C) 2015-2026 David Capello
 //
 // This file is released under the terms of the MIT license.
 // Read LICENSE.txt for more information.
@@ -11,6 +11,7 @@
 namespace undo {
 
   class UndoCommand;
+  class UndoContext;
   class UndoState;
 
   class UndoHistoryDelegate {
@@ -29,10 +30,10 @@ namespace undo {
     const UndoState* currentState() const { return m_cur; }
 
     void add(UndoCommand* cmd);
-    bool canUndo() const;
-    bool canRedo() const;
-    void undo();
-    void redo();
+    bool canUndo(UndoContext* ctx = nullptr) const;
+    bool canRedo(UndoContext* ctx = nullptr) const;
+    void undo(UndoContext* ctx = nullptr);
+    void redo(UndoContext* ctx = nullptr);
 
     // Deletes the whole redo history. Can be called before an add()
     // to create a linear undo history.
@@ -44,7 +45,7 @@ namespace undo {
 
     // This can be used to jump to a specific UndoState in the whole
     // history.
-    void moveTo(const UndoState* new_state);
+    void moveTo(const UndoState* new_state, UndoContext* ctx = nullptr);
 
   private:
     const UndoState* findCommonParent(const UndoState* a,

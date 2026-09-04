@@ -1,5 +1,5 @@
 // Undo Library
-// Copyright (C) 2015-2016 David Capello
+// Copyright (C) 2015-2026 David Capello
 //
 // This file is released under the terms of the MIT license.
 // Read LICENSE.txt for more information.
@@ -18,8 +18,8 @@ public:
     , m_redo_value(redo_value)
     , m_undo_value(undo_value) {
   }
-  void redo() override { m_model = m_redo_value; }
-  void undo() override { m_model = m_undo_value; }
+  void redo(undo::UndoContext* ctx = nullptr) override { m_model = m_redo_value; }
+  void undo(undo::UndoContext* ctx = nullptr) override { m_model = m_undo_value; }
   void dispose() override { }
 private:
   int& m_model;

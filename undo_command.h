@@ -1,5 +1,5 @@
 // Undo Library
-// Copyright (C) 2015-2016 David Capello
+// Copyright (C) 2015-2026 David Capello
 //
 // This file is released under the terms of the MIT license.
 // Read LICENSE.txt for more information.
@@ -10,11 +10,13 @@
 
 namespace undo {
 
+  class UndoContext;
+
   class UndoCommand {
   public:
     virtual ~UndoCommand() { }
-    virtual void undo() = 0;
-    virtual void redo() = 0;
+    virtual void undo(UndoContext* ctx) = 0;
+    virtual void redo(UndoContext* ctx) = 0;
     virtual void dispose() = 0;
   };
 

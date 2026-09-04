@@ -1,5 +1,5 @@
 // Undo Library
-// Copyright (C) 2015-2022 David Capello
+// Copyright (C) 2015-2026 David Capello
 //
 // This file is released under the terms of the MIT license.
 // Read LICENSE.txt for more information.
@@ -30,17 +30,17 @@ UndoHistory::~UndoHistory()
   clearRedo();
 }
 
-bool UndoHistory::canUndo() const
+bool UndoHistory::canUndo(UndoContext* ctx) const
 {
   return m_cur != nullptr;
 }
 
-bool UndoHistory::canRedo() const
+bool UndoHistory::canRedo(UndoContext* ctx) const
 {
   return m_cur != m_last;
 }
 
-void UndoHistory::undo()
+void UndoHistory::undo(UndoContext* ctx)
 {
   assert(m_cur);
   if (!m_cur)
@@ -50,15 +50,15 @@ void UndoHistory::undo()
     (m_cur != m_first && m_cur->m_prev) ||
     (m_cur == m_first && !m_cur->m_prev));
 
-  moveTo(m_cur->m_prev);
+  moveTo(m_cur->m_prev, ctx);
 }
 
-void UndoHistory::redo()
+void UndoHistory::redo(UndoContext* ctx)
 {
   if (!m_cur)
-    moveTo(m_first);
+    moveTo(m_first, ctx);
   else
-    moveTo(m_cur->m_next);
+    moveTo(m_cur->m_next, ctx);
 }
 
 void UndoHistory::clearRedo()
@@ -179,13 +179,13 @@ const UndoState* UndoHistory::findCommonParent(const UndoState* a,
   return pA;
 }
 
-void UndoHistory::moveTo(const UndoState* new_state)
+void UndoHistory::moveTo(const UndoState* new_state, UndoContext* ctx)
 {
   const UndoState* common = findCommonParent(m_cur, new_state);
 
   if (m_cur) {
     while (m_cur != common) {
-      m_cur->m_cmd->undo();
+      m_cur->m_cmd->undo(ctx);
       m_cur = m_cur->m_parent;
     }
   }
@@ -202,7 +202,7 @@ void UndoHistory::moveTo(const UndoState* new_state)
       p = redo_parents.top();
       redo_parents.pop();
 
-      p->m_cmd->redo();
+      p->m_cmd->redo(ctx);
     }
   }
 
