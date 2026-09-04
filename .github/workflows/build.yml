@@ -8,9 +8,11 @@ jobs:
       matrix:
         os: [windows-latest, macos-latest, ubuntu-latest]
     steps:
-    - uses: actions/checkout@v4
-    - uses: ilammy/msvc-dev-cmd@v1
+    - uses: actions/checkout@v7
+    - uses: TheMrMilchmann/setup-msvc-dev@v4
       if: runner.os == 'Windows'
+      with:
+        arch: x64
     - name: Generating Makefiles
       shell: bash
       run: |
