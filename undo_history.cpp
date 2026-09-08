@@ -141,15 +141,25 @@ bool UndoHistory::deleteFirstState()
 
 void UndoHistory::add(UndoCommand* cmd)
 {
+  // By default we add the command with the current state as its
+  // parent, and we move the current state to the new one. This is the
+  // most common operation for linear and non-linear undo histories.
+  add(cmd, m_cur, true);
+}
+
+void UndoHistory::add(UndoCommand* cmd, const UndoState* parent, const bool moveCur)
+{
   UndoState* state = new UndoState(cmd);
   state->m_prev = m_last;
   state->m_next = nullptr;
-  state->m_parent = m_cur;
+  state->m_parent = const_cast<UndoState*>(parent);
 
   if (!m_first)
     m_first = state;
 
-  m_cur = m_last = state;
+  m_last = state;
+  if (moveCur)
+    m_cur = m_last;
 
   if (state->m_prev) {
     assert(!state->m_prev->m_next);

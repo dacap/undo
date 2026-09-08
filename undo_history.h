@@ -29,7 +29,13 @@ namespace undo {
     const UndoState* lastState()    const { return m_last; }
     const UndoState* currentState() const { return m_cur; }
 
+    // Adds a new command to the undo history. If "moveCur" is false,
+    // the current state is not moved, which means that we're adding a
+    // state to the "redo history", a command that was executed and
+    // undone.
     void add(UndoCommand* cmd);
+    void add(UndoCommand* cmd, const UndoState* parent, bool moveCur);
+
     bool canUndo(UndoContext* ctx = nullptr) const;
     bool canRedo(UndoContext* ctx = nullptr) const;
     void undo(UndoContext* ctx = nullptr);

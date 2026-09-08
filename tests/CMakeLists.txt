@@ -1,5 +1,5 @@
 # Undo Library
-# Copyright (C) 2015-2021 David Capello
+# Copyright (C) 2015-2026 David Capello
 
 function(add_undo_test name)
   add_executable(${name} ${name}.cpp)
@@ -10,4 +10,5 @@ endfunction()
 
 add_undo_test(basics)
 add_undo_test(complex_tree)
+add_undo_test(load_undo)
 add_undo_test(tree)
